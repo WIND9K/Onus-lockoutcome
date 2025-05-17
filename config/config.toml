@@ -1,5 +1,0 @@
-[server]
-headless = true
-
-[general]
-mainScript = "lock_outcome.py"
