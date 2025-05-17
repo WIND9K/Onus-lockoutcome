@@ -87,14 +87,22 @@ if submitted:
 
         users = df.to_dict(orient='records')
         results = []
+        errors = []
         start_all = time.time()
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_user = {
-                executor.submit(process, row['userid'], row.get('comment', '')): row['userid']
-                for row in users
-            }
+            future_to_user = {}
+            for row in users:
+                if isinstance(row, dict) and 'userid' in row:
+                    future = executor.submit(process, row['userid'], row.get('comment', ''))
+                    future_to_user[future] = row['userid']
+                else:
+                    errors.append([row, "Invalid row format"])
+
             for future in as_completed(future_to_user):
-                results.append(future.result())
+                try:
+                    results.append(future.result())
+                except Exception as e:
+                    results.append([future_to_user[future], False, None, str(e), 0])
 
         duration_all = round(time.time() - start_all, 2)
         st.success(f"⏱️ Xử lý hoàn tất sau {duration_all} giây")
