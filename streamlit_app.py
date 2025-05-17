@@ -22,7 +22,7 @@ token = None
 # 1. Streamlit Cloud secrets
 try:
     token = st.secrets["ACCESS_CLIENT_TOKEN"]
-    st.success("🔑 Access Token đã được nạp tự động qua secrets")
+    st.success("🔑 Ứng dụng đã được cấp quyền")
 except:
     token = os.getenv("ACCESS_CLIENT_TOKEN")
     if token:
