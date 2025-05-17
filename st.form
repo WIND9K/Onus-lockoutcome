@@ -1,0 +1,16 @@
+import streamlit as st
+
+with st.form("token_form"):
+    token = st.text_input("🔐 Nhập Access-Client-Token", type="password")
+    uploaded_file = st.file_uploader("📁 Tải lên file lock_outcome.csv", type=["csv"])
+    submitted = st.form_submit_button("▶️ Bắt đầu xử lý")
+
+if submitted:
+    if not token:
+        st.warning("⚠️ Bạn chưa nhập Access Token.")
+    elif not uploaded_file:
+        st.warning("⚠️ Bạn chưa upload file CSV.")
+    else:
+        # Xử lý với token và file đã hợp lệ
+        # Đọc CSV, xử lý API
+        st.success("✅ Đã nhận token và file, đang xử lý...")
