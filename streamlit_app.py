@@ -3,7 +3,9 @@ import pandas as pd
 import requests
 import time
 import io
-import streamlit as st
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dotenv import load_dotenv
+import os
 
 # =======================
 # App UI + Logic (Streamlit)
@@ -11,17 +13,31 @@ import streamlit as st
 st.set_page_config(page_title="Lock Outcome Tool", layout="centered")
 st.title("🔐 Khóa tài khoản - OutCome")
 
+# =======================
+# Token Handling: Secrets -> .env -> Input
+# =======================
+load_dotenv()
+token = None
+
+# 1. Streamlit Cloud secrets
+try:
+    token = st.secrets["ACCESS_CLIENT_TOKEN"]
+    st.success("🔑 Access Token đã được nạp tự động qua secrets")
+except:
+    token = os.getenv("ACCESS_CLIENT_TOKEN")
+    if token:
+        st.success("🔑 Access Token đã được nạp tự động qua .env")
+
 with st.form("lock_form"):
-    token = st.text_input("Nhập Access-Client-Token", type="password")
+    if not token:
+        token = st.text_input("Nhập Access-Client-Token", type="password")
     file = st.file_uploader("Tải lên file lock_outcome.csv", type=["csv"])
     max_workers = st.number_input("Số luồng xử lý song song", min_value=1, max_value=20, value=5)
     submitted = st.form_submit_button("✅ Bắt đầu xử lý")
 
-
-
 if submitted:
     if not token:
-        st.error("🔒 Bạn chưa nhập Access Token")
+        st.error("🔒 Không có Access Token hợp lệ. Vui lòng cấu hình secrets hoặc nhập thủ công.")
     elif not file:
         st.error("📁 Bạn chưa tải file CSV")
     else:
@@ -31,8 +47,6 @@ if submitted:
             "Access-Client-Token": token,
             "Content-Type": "application/json"
         }
-
-        from concurrent.futures import ThreadPoolExecutor, as_completed
 
         def get_version(userid):
             uid = "'" + str(userid)
@@ -88,7 +102,6 @@ if submitted:
         result_df = pd.DataFrame(results, columns=['userid', 'success', 'status_code', 'msg', 'duration_seconds'])
         st.dataframe(result_df)
 
-        # Tạo file download
         output = io.StringIO()
         result_df.to_csv(output, index=False)
         st.download_button(
