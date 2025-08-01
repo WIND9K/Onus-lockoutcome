@@ -19,14 +19,6 @@ st.title("🔐 Khóa tài khoản - OutCome")
 load_dotenv()
 token = None
 
-def format_userid(uid, path=""):
-    uid_str = str(uid).strip()
-    if len(uid_str) < 16:
-        return f"https://wallet.goonus.io/api/users/'{uid_str}{path}"
-    else:
-        return f"https://wallet.goonus.io/api/users/{uid_str}{path}"
-
-
 # 1. Streamlit Cloud secrets
 try:
     token = st.secrets["ACCESS_CLIENT_TOKEN"]
@@ -57,24 +49,19 @@ if submitted:
         }
 
         def get_version(userid):
-            url = format_userid(userid, "/data-for-edit")
+            uid = "'" + str(userid)
+            url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
+            print(url)
             try:
                 resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
-                data = resp.json()
-                user = data.get("user")
-                if not user or "version" not in user:
-                    st.warning(f"⚠️ Không tìm thấy version cho userid: {userid}")
-                    return None
-                return user["version"]
-            except requests.exceptions.RequestException as e:
-                st.error(f"❌ Lỗi lấy version cho userid: {userid}")
-                st.code(f"URL: {url}\nStatus: {getattr(e.response, 'status_code', 'N/A')}\nBody: {getattr(e.response, 'text', 'N/A')}")
+                return resp.json().get("user", {}).get("version")
+            except:
                 return None
 
-
         def lock_user(userid, comment, version):
-            url = format_userid(userid)
+            uid = "'" + str(userid)
+            url = f"https://wallet.vndc.io/api/users/{uid}"
             body = {
                 "customValues": {
                     "blocked_features": "create_evoucher|escrow_create|offchain_send|onchain_send|p2p|pay_ticket|sell_vndc_via_partner|sell_vndc_via_system|nami_futures_send|exchange|loan_create|loan_repayment",
@@ -93,15 +80,11 @@ if submitted:
         def process(uid, comment):
             start = time.time()
             version = get_version(uid)
-            duration = round(time.time() - start, 3)
-
-            if version is None:
-                return [uid, False, None, "versionInfo not found", duration]
-
+            if not version:
+                return [uid, False, None, "versionInfo not found", 0]
             success, status, msg = lock_user(uid, comment, version)
+            duration = round(time.time() - start, 3)
             return [uid, success, status, msg, duration]
-
-
 
         users = df.to_dict(orient='records')
         results = []
