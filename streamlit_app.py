@@ -61,11 +61,17 @@ if submitted:
             try:
                 resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
-                return resp.json().get("user", {}).get("version")
+                data = resp.json()
+                user = data.get("user")
+                if not user or "version" not in user:
+                    st.warning(f"⚠️ Không tìm thấy version cho userid: {userid}")
+                    return None
+                return user["version"]
             except requests.exceptions.RequestException as e:
                 st.error(f"❌ Lỗi lấy version cho userid: {userid}")
                 st.code(f"URL: {url}\nStatus: {getattr(e.response, 'status_code', 'N/A')}\nBody: {getattr(e.response, 'text', 'N/A')}")
                 return None
+
 
         def lock_user(userid, comment, version):
             url = format_userid(userid)
@@ -89,12 +95,12 @@ if submitted:
             version = get_version(uid)
             duration = round(time.time() - start, 3)
 
-            if not version:
-                # Không gọi lock_user nếu không có version
+            if version is None:
                 return [uid, False, None, "versionInfo not found", duration]
 
             success, status, msg = lock_user(uid, comment, version)
             return [uid, success, status, msg, duration]
+
 
 
         users = df.to_dict(orient='records')
