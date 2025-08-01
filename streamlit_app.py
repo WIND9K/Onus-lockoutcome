@@ -20,6 +20,14 @@ load_dotenv()
 token = None
 logs = []
 
+def format_userid(userid):
+    uid_str = str(userid)
+    if len(uid_str) > 15:
+        return f'"{uid_str}"'  # Sử dụng dấu nháy kép cho số lớn
+    else:
+        return f"'{uid_str}'"  # Dùng nháy đơn cho số thường
+# =======================
+
 # 1. Streamlit Cloud secrets
 try:
     token = st.secrets["ACCESS_CLIENT_TOKEN"]
@@ -50,7 +58,7 @@ if submitted:
         }
 
         def get_version(userid):
-            uid = "'" + str(userid)
+            uid = format_userid(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
             logs.append(f"[GET] {uid} -> {url}")
             try:
@@ -62,7 +70,7 @@ if submitted:
                 return None
 
         def lock_user(userid, comment, version):
-            uid = "'" + str(userid)
+            uid = format_userid(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}"
             body = {
                 "customValues": {
@@ -72,12 +80,15 @@ if submitted:
                 },
                 "version": version
             }
+            logs.append(f"[PUT] {uid} -> {url}")
             try:
                 resp = requests.put(url, json=body, headers=headers, timeout=10)
                 resp.raise_for_status()
                 return True, resp.status_code, resp.text
             except Exception as e:
+                logs.append(f"[PUT][LỖI] {uid}: {e}")
                 return False, None, str(e)
+
 
         def process(uid, comment):
             start = time.time()
