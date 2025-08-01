@@ -61,7 +61,7 @@ if submitted:
                 resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
                 return resp.json().get("user", {}).get("version")
-            except:
+            except requests.exceptions.RequestException as e:
                 print(f"[get_version] ❌ Error fetching version for userid={userid}")
                 print(f"[get_version] URL: {url}")
                 print(f"[get_version] Status Code: {getattr(e.response, 'status_code', 'N/A')}")
