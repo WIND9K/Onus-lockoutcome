@@ -117,7 +117,17 @@ if submitted:
         duration_all = round(time.time() - start_all, 2)
         st.success(f"⏱️ Xử lý hoàn tất sau {duration_all} giây")
 
+        def highlight_success(val):
+            if val is True:
+                return '✅'
+            elif val is False:
+                return '❌'
+            return val
+
+
         result_df = pd.DataFrame(results, columns=['userid', 'success', 'status_code', 'msg', 'duration_seconds'])
+        st.dataframe(result_df)
+        result_df['success'] = result_df['success'].apply(highlight_success)
         st.dataframe(result_df)
 
         # with st.expander("📜 Xem log chi tiết"):
