@@ -125,7 +125,7 @@ if submitted:
             return val
 
 
-        # result_df = pd.DataFrame(results, columns=['userid', 'success', 'status_code', 'msg', 'duration_seconds'])
+        result_df = pd.DataFrame(results, columns=['userid', 'success', 'status_code', 'msg', 'duration_seconds'])
         # st.dataframe(result_df)
         result_df['success'] = result_df['success'].apply(highlight_success)
         st.dataframe(result_df)
