@@ -54,6 +54,8 @@ if submitted:
             "Content-Type": "application/json"
         }
 
+        log_messages = []
+
         def get_version(userid):
             uid = format_userid(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
@@ -62,8 +64,10 @@ if submitted:
                 resp.raise_for_status()
                 return resp.json().get("user", {}).get("version")
             except requests.exceptions.RequestException as e:
-                st.error(f"❌ Lỗi lấy version cho userid: {userid}")
-                st.code(f"URL: {url}\nStatus: {getattr(e.response, 'status_code', 'N/A')}\nBody: {getattr(e.response, 'text', 'N/A')}")
+                log_messages.append(f"[get_version] ❌ userid: {userid}")
+                log_messages.append(f"URL: {url}")
+                log_messages.append(f"Status: {getattr(e.response, 'status_code', 'N/A')}")
+                log_messages.append(f"Body: {getattr(e.response, 'text', 'N/A')}")
                 return None
 
         def lock_user(userid, comment, version):
@@ -126,3 +130,8 @@ if submitted:
             file_name="lock_outcome_result.csv",
             mime="text/csv"
         )
+
+if log_messages:
+    with st.expander("📄 Chi tiết log lỗi"):
+        for msg in log_messages:
+            st.write(msg)
