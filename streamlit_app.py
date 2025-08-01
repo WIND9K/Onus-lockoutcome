@@ -21,11 +21,7 @@ token = None
 logs = []
 
 def format_userid(userid):
-    uid_str = str(userid)
-    if len(uid_str) > 15:
-        return f'"{uid_str}"'  # Sử dụng dấu nháy kép cho số lớn
-    else:
-        return f"'{uid_str}'"  # Dùng nháy đơn cho số thường
+    return str(userid) 
 # =======================
 
 # 1. Streamlit Cloud secrets
