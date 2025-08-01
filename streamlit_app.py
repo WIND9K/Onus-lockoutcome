@@ -120,9 +120,9 @@ if submitted:
         result_df = pd.DataFrame(results, columns=['userid', 'success', 'status_code', 'msg', 'duration_seconds'])
         st.dataframe(result_df)
 
-        with st.expander("📜 Xem log chi tiết"):
-            for log in logs:
-                st.text(log)
+        # with st.expander("📜 Xem log chi tiết"):
+        #     for log in logs:
+        #         st.text(log)
 
 
         output = io.StringIO()
