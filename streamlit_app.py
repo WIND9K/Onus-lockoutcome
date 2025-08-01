@@ -57,6 +57,7 @@ if submitted:
         def get_version(userid):
             uid = format_userid(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
+            print(url)
             try:
                 resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
