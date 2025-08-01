@@ -87,11 +87,15 @@ if submitted:
         def process(uid, comment):
             start = time.time()
             version = get_version(uid)
-            if not version:
-                return [uid, False, None, "versionInfo not found", 0]
-            success, status, msg = lock_user(uid, comment, version)
             duration = round(time.time() - start, 3)
+
+            if not version:
+                # Không gọi lock_user nếu không có version
+                return [uid, False, None, "versionInfo not found", duration]
+
+            success, status, msg = lock_user(uid, comment, version)
             return [uid, success, status, msg, duration]
+
 
         users = df.to_dict(orient='records')
         results = []
