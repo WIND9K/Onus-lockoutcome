@@ -111,6 +111,14 @@ if submitted:
         result_df = pd.DataFrame(results, columns=['userid', 'success', 'status_code', 'msg', 'duration_seconds'])
         st.dataframe(result_df)
 
+        # Hiển thị lỗi nếu có
+        error_rows = result_df[result_df["success"] == False]
+        if not error_rows.empty:
+            st.warning(f"⚠️ Có {len(error_rows)} tài khoản lỗi:")
+            for idx, row in error_rows.iterrows():
+                st.error(f"❌ UserID: {row['userid']} | Status: {row['status_code']} | Lỗi: {row['msg']}")
+
+
         output = io.StringIO()
         result_df.to_csv(output, index=False)
         st.download_button(
