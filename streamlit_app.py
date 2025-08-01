@@ -18,6 +18,7 @@ st.title("🔐 Khóa tài khoản - OutCome")
 # =======================
 load_dotenv()
 token = None
+logs = []
 
 # 1. Streamlit Cloud secrets
 try:
@@ -51,12 +52,13 @@ if submitted:
         def get_version(userid):
             uid = "'" + str(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
-            st.info(f"📡 Đang gọi GET: {url}")
+            logs.append(f"[GET] {uid} -> {url}")
             try:
                 resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
                 return resp.json().get("user", {}).get("version")
-            except:
+            except Exception as e:
+                logs.append(f"[GET][LỖI] {uid}: {e}")
                 return None
 
         def lock_user(userid, comment, version):
@@ -111,12 +113,9 @@ if submitted:
         result_df = pd.DataFrame(results, columns=['userid', 'success', 'status_code', 'msg', 'duration_seconds'])
         st.dataframe(result_df)
 
-        # Hiển thị lỗi nếu có
-        error_rows = result_df[result_df["success"] == False]
-        if not error_rows.empty:
-            st.warning(f"⚠️ Có {len(error_rows)} tài khoản lỗi:")
-            for idx, row in error_rows.iterrows():
-                st.error(f"❌ UserID: {row['userid']} | Status: {row['status_code']} | Lỗi: {row['msg']}")
+        with st.expander("📜 Xem log chi tiết"):
+            for log in logs:
+                st.text(log)
 
 
         output = io.StringIO()
