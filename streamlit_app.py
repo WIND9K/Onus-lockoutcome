@@ -19,11 +19,13 @@ st.title("🔐 Khóa tài khoản - OutCome")
 load_dotenv()
 token = None
 
-def format_userid(uid):
-    uid_str = str(uid)
-    if len(uid_str) >= 16:
-        return f'"{uid_str}"'
-    return uid_str
+def format_userid(uid, path=""):
+    uid_str = str(uid).strip()
+    if len(uid_str) < 16:
+        return f"https://wallet.goonus.io/api/users/'{uid_str}{path}"
+    else:
+        return f"https://wallet.goonus.io/api/users/{uid_str}{path}"
+
 
 # 1. Streamlit Cloud secrets
 try:
@@ -55,8 +57,7 @@ if submitted:
         }
 
         def get_version(userid):
-            uid = format_userid(userid)
-            url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
+            url = format_userid(userid, "/data-for-edit")
             try:
                 resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
@@ -67,8 +68,7 @@ if submitted:
                 return None
 
         def lock_user(userid, comment, version):
-            uid = format_userid(userid)
-            url = f"https://wallet.vndc.io/api/users/{uid}"
+            url = format_userid(userid)
             body = {
                 "customValues": {
                     "blocked_features": "create_evoucher|escrow_create|offchain_send|onchain_send|p2p|pay_ticket|sell_vndc_via_partner|sell_vndc_via_system|nami_futures_send|exchange|loan_create|loan_repayment",
