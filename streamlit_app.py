@@ -19,6 +19,12 @@ st.title("🔐 Khóa tài khoản - OutCome")
 load_dotenv()
 token = None
 
+def format_userid(uid):
+    uid_str = str(uid)
+    if len(uid_str) >= 16:
+        return f'"{uid_str}"'
+    return uid_str
+
 # 1. Streamlit Cloud secrets
 try:
     token = st.secrets["ACCESS_CLIENT_TOKEN"]
@@ -32,7 +38,7 @@ with st.form("lock_form"):
     if not token:
         token = st.text_input("Nhập Access-Client-Token", type="password")
     file = st.file_uploader("Tải lên file lock_outcome.csv", type=["csv"])
-    max_workers = st.number_input("Số luồng xử lý song song", min_value=1, max_value=20, value=5)
+    max_workers = st.number_input("Số luồng xử lý song song", min_value=1, max_value=10, value=5)
     submitted = st.form_submit_button("✅ Bắt đầu xử lý")
 
 if submitted:
@@ -49,7 +55,7 @@ if submitted:
         }
 
         def get_version(userid):
-            uid = "'" + str(userid)
+            uid = format_userid(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
             try:
                 resp = requests.get(url, headers=headers, timeout=10)
@@ -59,7 +65,7 @@ if submitted:
                 return None
 
         def lock_user(userid, comment, version):
-            uid = "'" + str(userid)
+            uid = format_userid(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}"
             body = {
                 "customValues": {
