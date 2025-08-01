@@ -57,12 +57,15 @@ if submitted:
         def get_version(userid):
             uid = format_userid(userid)
             url = f"https://wallet.vndc.io/api/users/{uid}/data-for-edit"
-            print(url)
             try:
                 resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
                 return resp.json().get("user", {}).get("version")
             except:
+                print(f"[get_version] ❌ Error fetching version for userid={userid}")
+                print(f"[get_version] URL: {url}")
+                print(f"[get_version] Status Code: {getattr(e.response, 'status_code', 'N/A')}")
+                print(f"[get_version] Response Body: {getattr(e.response, 'text', 'N/A')}")
                 return None
 
         def lock_user(userid, comment, version):
