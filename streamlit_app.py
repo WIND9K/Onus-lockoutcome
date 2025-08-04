@@ -21,7 +21,11 @@ token = None
 logs = []
 
 def format_userid(userid):
-    return str(userid) 
+    uid = str(userid).strip()
+    if len(uid) < 16:
+        return f"'{uid}'"
+    return uid
+
 # =======================
 
 # 1. Streamlit Cloud secrets
