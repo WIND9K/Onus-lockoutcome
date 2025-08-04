@@ -130,9 +130,9 @@ if submitted:
         result_df['success'] = result_df['success'].apply(highlight_success)
         st.dataframe(result_df)
 
-        # with st.expander("📜 Xem log chi tiết"):
-        #     for log in logs:
-        #         st.text(log)
+        with st.expander("📜 Xem log chi tiết"):
+            for log in logs:
+                st.text(log)
 
 
         output = io.StringIO()
