@@ -27,6 +27,20 @@ def format_userid(userid):
     return uid
 
 # =======================
+BLOCK_OPTIONS = [
+    "create_evoucher",
+    "escrow_create",
+    "offchain_send",
+    "onchain_send",
+    "p2p",
+    "pay_ticket",
+    "sell_vndc_via_partner",
+    "sell_vndc_via_system",
+    "nami_futures_send",
+    "exchange",
+    "loan_create",
+    "loan_repayment"
+]
 
 # 1. Streamlit Cloud secrets
 try:
@@ -38,6 +52,16 @@ except:
         st.success("🔑 Access Token đã được nạp tự động qua .env")
 
 with st.form("lock_form"):
+    st.subheader("🔧 Tuỳ chọn khóa tài khoản")
+    select_all = st.checkbox("🔒 Chọn tất cả các tính năng", value=True)
+
+    if select_all:
+        selected_blocks = BLOCK_OPTIONS  # tất cả
+    else:
+        selected_blocks = st.multiselect("Chọn các tính năng muốn khóa:", BLOCK_OPTIONS, default=[])
+
+    frozen_flag = st.checkbox("🧊 Đóng băng tài khoản (frozen)", value=True)
+
     if not token:
         token = st.text_input("Nhập Access-Client-Token", type="password")
     file = st.file_uploader("Tải lên file lock_outcome.csv", type=["csv"])
@@ -74,9 +98,9 @@ if submitted:
             url = f"https://wallet.vndc.io/api/users/{uid}"
             body = {
                 "customValues": {
-                    "blocked_features": "create_evoucher|escrow_create|offchain_send|onchain_send|p2p|pay_ticket|sell_vndc_via_partner|sell_vndc_via_system|nami_futures_send|exchange|loan_create|loan_repayment",
+                    "blocked_features":  "|".join(selected_blocks),
                     "blocked_features_note": comment,
-                    "frozen": "true"
+                    "frozen": str(frozen_flag).lower()
                 },
                 "version": version
             }
