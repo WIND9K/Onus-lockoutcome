@@ -53,14 +53,14 @@ except:
 
 with st.form("lock_form"):
     st.subheader("🔧 Tuỳ chọn khóa tài khoản")
-    select_all = st.checkbox("🔒 Chọn tất cả các tính năng", value=True)
+    select_all = st.checkbox("🔒 Outcome", value=True)
 
     if select_all:
         selected_blocks = BLOCK_OPTIONS  # tất cả
     else:
         selected_blocks = st.multiselect("Chọn các tính năng muốn khóa:", BLOCK_OPTIONS, default=[])
 
-    frozen_flag = st.checkbox("🧊 Đóng băng tài khoản (frozen)", value=True)
+    frozen_flag = st.checkbox("🧊 Frozen", value=True)
 
     if not token:
         token = st.text_input("Nhập Access-Client-Token", type="password")
